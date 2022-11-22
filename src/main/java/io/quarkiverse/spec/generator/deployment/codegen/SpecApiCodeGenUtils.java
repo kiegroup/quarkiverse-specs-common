@@ -11,19 +11,24 @@ public final class SpecApiCodeGenUtils {
 
     private static final String BUILD_TIME_SPEC_PREFIX_FORMAT = "quarkus.%s.spec.%s";
     private static final String BASE_PACKAGE_PROP_FORMAT = "%s.base-package";
+    private static final String IGNORED_FILES_PROP_FORMAT = "quarkus.%s.codegen.ignore";
 
-    public static String getSanitizedFileName(final Path openApiFilePath) {
+    public static String getSanitizedFileName(final Path specFilePath) {
         return StringUtil
                 .replaceNonAlphanumericByUnderscores(
-                        SpecApiGeneratorOutputPaths.getRelativePath(openApiFilePath).toString());
+                        SpecApiGeneratorOutputPaths.getRelativePath(specFilePath).toString());
     }
 
-    public static String getBuildTimeSpecPropertyPrefix(final Path openApiFilePath, String configPrefix) {
-        return String.format(BUILD_TIME_SPEC_PREFIX_FORMAT, configPrefix, getSanitizedFileName(openApiFilePath));
+    public static String getBuildTimeSpecPropertyPrefix(final Path specFilePath, String configPrefix) {
+        return String.format(BUILD_TIME_SPEC_PREFIX_FORMAT, configPrefix, getSanitizedFileName(specFilePath));
+    }
+    
+    public static String getIgnoredFilesPropFormat (String configPrefix) {
+    	return String.format(IGNORED_FILES_PROP_FORMAT, configPrefix);
     }
 
-    public static String getBasePackagePropertyName(final Path openApiFilePath, String configPrefix) {
-        return String.format(BASE_PACKAGE_PROP_FORMAT, getBuildTimeSpecPropertyPrefix(openApiFilePath, configPrefix));
+    public static String getBasePackagePropertyName(final Path specFilePath, String configPrefix) {
+        return String.format(BASE_PACKAGE_PROP_FORMAT, getBuildTimeSpecPropertyPrefix(specFilePath, configPrefix));
     }
 
 }

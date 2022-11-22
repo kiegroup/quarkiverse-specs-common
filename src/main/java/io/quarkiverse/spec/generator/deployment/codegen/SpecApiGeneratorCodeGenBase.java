@@ -16,10 +16,11 @@ import io.quarkus.deployment.CodeGenContext;
 import io.quarkus.deployment.CodeGenProvider;
 
 /**
- * Code generation for OpenApi Client. Generates Java classes from OpenApi spec files located in src/main/openapi or
- * src/test/openapi
- * <p>
- * Wraps the <a href="https://openapi-generator.tech/docs/generators/java">OpenAPI Generator Client for Java</a>
+ * Base class for Spec generator.
+ * 
+ * It contain the code for scanning input files based on SpecApiContants provided by concrete extensions
+ * It is responsible for invoking SpecCodeGenerator.generateCode. 
+ *
  */
 public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
 
@@ -39,22 +40,22 @@ public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
     @Override
     public boolean trigger(CodeGenContext context) throws CodeGenException {
         final Path outDir = context.outDir();
-        final Path openApiDir = context.inputDir();
+        final Path specDir = context.inputDir();
         final List<String> ignoredFiles = context.config()
-                .getOptionalValues("quarkus.openapi-generator.codegen.ignore", String.class).orElse(List.of());
+                .getOptionalValues(SpecApiCodeGenUtils.getIgnoredFilesPropFormat(constants.getConfigPrefix()) ,String.class).orElse(List.of());
 
-        if (Files.isDirectory(openApiDir)) {
-            try (Stream<Path> openApiFilesPaths = Files.walk(openApiDir)) {
-                openApiFilesPaths
+        if (Files.isDirectory(specDir)) {
+            try (Stream<Path> specFilePaths = Files.walk(specDir)) {
+                specFilePaths
                         .filter(Files::isRegularFile)
                         .filter(path -> {
                             String fileName = path.getFileName().toString();
                             return fileName.endsWith(inputExtension()) && !ignoredFiles.contains(fileName);
                         })
-                        .forEach(openApiFilePath -> generator.generate(context.config(), openApiFilePath, outDir,
-                                getBasePackage(context.config(), openApiFilePath)));
+                        .forEach(specFilePath -> generator.generate(context.config(), specFilePath, outDir,
+                                getBasePackage(context.config(), specFilePath)));
             } catch (IOException e) {
-                throw new CodeGenException("Failed to generate java files from OpenApi files in " + openApiDir.toAbsolutePath(),
+                throw new CodeGenException("Failed to generate java files from directory: " + specDir.toAbsolutePath(),
                         e);
             }
             return true;
@@ -72,9 +73,9 @@ public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
         return "." + constants.getExtension();
     }
 
-    protected final String getBasePackage(final Config config, final Path openApiFilePath) {
+    protected final String getBasePackage(final Config config, final Path specFilePath) {
         return config
-                .getOptionalValue(getBasePackagePropertyName(openApiFilePath, constants.getConfigPrefix()), String.class)
-                .orElse(String.format("%s.%s", constants.getDefaultPackage(), getSanitizedFileName(openApiFilePath)));
+                .getOptionalValue(getBasePackagePropertyName(specFilePath, constants.getConfigPrefix()), String.class)
+                .orElse(String.format("%s.%s", constants.getDefaultPackage(), getSanitizedFileName(specFilePath)));
     }
 }

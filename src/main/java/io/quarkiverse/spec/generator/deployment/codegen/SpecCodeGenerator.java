@@ -6,6 +6,6 @@ import org.eclipse.microprofile.config.Config;
 
 public interface SpecCodeGenerator {
 
-    void generate(final Config config, final Path openApiFilePath, final Path outDir, final String basePackage);
+    void generate(final Config config, final Path specFilePath, final Path outDir, final String basePackage);
 
 }
