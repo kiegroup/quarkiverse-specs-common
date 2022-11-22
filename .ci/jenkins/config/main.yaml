@@ -1,0 +1,26 @@
+ecosystem:
+  main_project: quarkiverse-specs
+  projects:
+  - name: quarkiverse-specs
+    regexs:
+    - quarkiverse-specs.*
+git:
+  branches:
+  - name: main
+    main_branch: true
+    seed:
+      branch: main
+  main_branch:
+    default: main
+seed:
+  config_file:
+    git:
+      repository: quarkiverse-specs-common
+      author:
+        name: kiegroup
+        credentials_id: kie-ci
+      branch: main
+    path: .ci/jenkins/config/branch.yaml
+  jenkinsfile: dsl/seed/jenkinsfiles/Jenkinsfile.seed.branch
+jenkins:
+  email_creds_id: QUARKIVERSE_CI_EMAIL_TO

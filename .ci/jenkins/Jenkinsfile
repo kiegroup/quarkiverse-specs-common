@@ -1,0 +1,190 @@
+@Library('jenkins-pipeline-shared-libraries')_
+
+changeAuthor = env.ghprbAuthorRepoGitUrl ? util.getGroup(env.ghprbAuthorRepoGitUrl) : (env.ghprbPullAuthorLogin ?: CHANGE_AUTHOR)
+changeBranch = env.ghprbSourceBranch ?: CHANGE_BRANCH
+changeTarget = env.ghprbTargetBranch ?: CHANGE_TARGET
+
+BUILD_FAILED_IMAGES = []
+
+pipeline {
+    agent { label 'kogito-image-slave && !built-in' }
+    tools {
+        jdk 'kie-jdk11'
+    }
+    options {
+        timeout(time: 120, unit: 'MINUTES')
+    }
+    environment {
+        CI = true
+    }
+    stages {
+        stage('Initialization') {
+            steps {
+                script {
+                    clean()
+
+                    // Set the mirror url only if exist
+                    if (env.MAVEN_MIRROR_REPOSITORY != null
+                            && env.MAVEN_MIRROR_REPOSITORY != '') {
+                        env.MAVEN_MIRROR_URL = env.MAVEN_MIRROR_REPOSITORY
+                            }
+
+                    githubscm.checkoutIfExists('kogito-images', changeAuthor, changeBranch, 'kiegroup', changeTarget, true)
+
+                    //Ignore self-signed certificates if MAVEN_MIRROR_URL is defined
+                    if (env.MAVEN_MIRROR_URL != '') {
+                        sh 'python3 scripts/update-tests.py --ignore-self-signed-cert'
+                    }
+                }
+            }
+        }
+        stage('Validate CeKit Image and Modules descriptors') {
+            steps {
+                script {
+                    sh '''
+                        curl -Ls https://github.com/kiegroup/kie-cloud-tools/releases/download/v1.3.2/cekit-image-validator-runner.tgz --output cekit-image-validator-runner.tgz
+                        tar -xzvf cekit-image-validator-runner.tgz
+                        chmod +x cekit-image-validator-runner
+                    '''
+                    sh './cekit-image-validator-runner modules/'
+                    sh './cekit-image-validator-runner image.yaml'
+                    getImages().each { image -> sh "./cekit-image-validator-runner ${image}-overrides.yaml" }
+                }
+            }
+        }
+        stage('Prepare offline kogito-examples') {
+            steps {
+                sh 'make clone-repos'
+            }
+        }
+        stage('Build & Test Images') {
+            steps {
+                script {
+                    parallelStages = [:]
+                    getImages().each { image ->
+                        initWorkspace(image)
+                        String workspacePath = getWorkspacePath(image)
+                        parallelStages["Build&Test ${image}"] = {
+                            stage("Build/Test ${image}") {
+                                dir(workspacePath) {
+                                    try {
+                                        buildImage(image)
+                                    } catch (err) {
+                                        registerBuildFailedImage(image)
+                                        util.archiveConsoleLog(image, 400)
+                                        throw err
+                                    }
+                                    try {
+                                        testImage(image)
+                                    } catch (err) {
+                                        echo "Testing error(s) for image ${image}"
+                                    } finally {
+                                        junit testResults: 'target/test/results/*.xml', allowEmptyResults: true
+                                        archiveArtifacts artifacts: 'target/test/results/*.xml', allowEmptyArchive: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    parallel parallelStages
+                }
+            }
+            post {
+                always {
+                    script {
+                        cleanWorkspaces()
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                clean()
+            }
+        }
+        unsuccessful {
+            script {
+                def additionalInfo = ''
+                if (getBuildFailedImages()){
+                    additionalInfo += 'Build failures on those images:\n'
+                    getBuildFailedImages().each {
+                        additionalInfo += "- ${it}\n"
+                    }
+                }
+                pullrequest.postComment(util.getMarkdownTestSummary('PR', additionalInfo, "${BUILD_URL}", 'GITHUB'))
+            }
+        }
+    }
+}
+
+void clean() {
+    cleanWorkspaces()
+    cleanImages()
+
+    // Clean Cekit cache, in case we reuse an old node
+    sh "rm -rf \$HOME/.cekit/cache"
+}
+
+void cleanImages() {
+    sh "docker rm -f \$(docker ps -a -q) || date"
+    sh "docker rmi -f \$(docker images -q) || date"
+}
+
+void launchParallelForEachImage(stageNamePrefix, executeOnImage) {
+    parallelStages = [:]
+    getImages().each { image ->
+        parallelStages["${stageNamePrefix} ${image}"] = {
+            dir(getWorkspacePath(image)) {
+                executeOnImage(image)
+            }
+        }
+    }
+    parallel parallelStages
+}
+
+void buildImage(String imageName) {
+    sh "make build-image ${getMakeBuildImageArgs()} image_name=${imageName} ignore_test=true"
+}
+
+void testImage(String imageName) {
+    sh "make build-image ${getMakeBuildImageArgs()} image_name=${imageName} ignore_build=true ignore_test_prepare=true"
+}
+
+String getMakeBuildImageArgs() {
+    List args = [ "cekit_option='--work-dir .'" ]
+    args.add("KOGITO_APPS_TARGET_BRANCH=${changeTarget}")
+    return args.join(' ')
+}
+
+void registerBuildFailedImage(String imageName) {
+    lock("${BUILD_URL} build failed") {
+        BUILD_FAILED_IMAGES.add(imageName)
+    }
+}
+
+List getBuildFailedImages() {
+    return BUILD_FAILED_IMAGES
+}
+
+void initWorkspace(String image) {
+    sh "mkdir -p ${getWorkspacePath(image)}"
+    sh "rsync -av --progress . ${getWorkspacePath(image)} --exclude workspaces"
+}
+
+void cleanWorkspaces() {
+    sh "rm -rf ${getWorkspacesPath()}"
+}
+
+String getWorkspacesPath() {
+    return "${WORKSPACE}/workspaces"
+}
+
+String getWorkspacePath(String image) {
+    return "${getWorkspacesPath()}/${image}"
+}
+
+String[] getImages() {
+    return sh(script: "make list | tr '\\n' ','", returnStdout: true).trim().split(',')
+}
