@@ -122,7 +122,7 @@ pipeline {
             steps {
                 script {
                     // Deploy to specific repository with credentials
-                    maven.uploadLocalArtifacts(env.MAVEN_REPO_CREDS_ID, getLocalDeploymentFolder(), getMavenRepoZipUrl())
+                    echo "maven.uploadLocalArtifacts(${env.MAVEN_REPO_CREDS_ID}, ${getLocalDeploymentFolder()}, ${getMavenRepoZipUrl()})"
                 }
             }
         }
@@ -133,7 +133,7 @@ pipeline {
             steps {
                 script {
                     // Stage release artifacts
-                    runMavenStage()
+                    echo "runMavenStage()"
                 }
             }
         }
