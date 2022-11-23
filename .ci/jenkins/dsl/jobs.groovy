@@ -55,7 +55,7 @@ KogitoJobUtils.createQuarkusUpdateToolsJob(this, 'quarkiverse-specs-common', [
 /////////////////////////////////////////////////////////////////
 
 void createSetupBranchJob() {
-    def jobParams = KogitoJobUtils.getBasicJobParams(this, 'drools', Folder.SETUP_BRANCH, "${jenkins_path}/Jenkinsfile.setup-branch", 'Drools Init branch')
+    def jobParams = KogitoJobUtils.getBasicJobParams(this, 'quarkiverse-specs-common', Folder.SETUP_BRANCH, "${jenkins_path}/Jenkinsfile.setup-branch", 'Quarkiverse Specs Common Init branch')
     KogitoJobUtils.setupJobParamsDefaultMavenConfiguration(this, jobParams)
     jobParams.env.putAll([
         JENKINS_EMAIL_CREDS_ID: "${JENKINS_EMAIL_CREDS_ID}",
@@ -75,7 +75,7 @@ void createSetupBranchJob() {
 
             stringParam('BUILD_BRANCH_NAME', "${GIT_BRANCH}", 'Set the Git branch to checkout')
 
-            stringParam('QUARKIVERSE_SPECS_COMMON_VERSION', '', 'Drools version to set.')
+            stringParam('QUARKIVERSE_SPECS_COMMON_VERSION', '', 'Quarkiverse Specs Common version to set.')
 
             booleanParam('SEND_NOTIFICATION', false, 'In case you want the pipeline to send a notification on CI channel for this run.')
         }
@@ -83,7 +83,7 @@ void createSetupBranchJob() {
 }
 
 void setupDeployJob(Folder jobFolder) {
-    def jobParams = KogitoJobUtils.getBasicJobParams(this, 'drools-deploy', jobFolder, "${jenkins_path}/Jenkinsfile.deploy", 'Drools Deploy')
+    def jobParams = KogitoJobUtils.getBasicJobParams(this, 'quarkiverse-specs-common-deploy', jobFolder, "${jenkins_path}/Jenkinsfile.deploy", 'Quarkiverse Specs Common Deploy')
     KogitoJobUtils.setupJobParamsDefaultMavenConfiguration(this, jobParams)
     jobParams.env.putAll([
         PROPERTIES_FILE_NAME: 'deployment.properties',
@@ -122,7 +122,7 @@ void setupDeployJob(Folder jobFolder) {
 }
 
 void setupPromoteJob(Folder jobFolder) {
-    def jobParams = KogitoJobUtils.getBasicJobParams(this, 'drools-promote', jobFolder, "${jenkins_path}/Jenkinsfile.promote", 'Drools Promote')
+    def jobParams = KogitoJobUtils.getBasicJobParams(this, 'quarkiverse-specs-common-promote', jobFolder, "${jenkins_path}/Jenkinsfile.promote", 'Quarkiverse Specs Common Promote')
     KogitoJobUtils.setupJobParamsDefaultMavenConfiguration(this, jobParams)
     jobParams.env.putAll([
         PROPERTIES_FILE_NAME: 'deployment.properties',
