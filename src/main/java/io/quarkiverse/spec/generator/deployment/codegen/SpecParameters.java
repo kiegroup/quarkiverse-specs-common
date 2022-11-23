@@ -1,6 +1,6 @@
 package io.quarkiverse.spec.generator.deployment.codegen;
 
-public abstract class SpecApiParameters {
+public abstract class SpecParameters {
 
     public static final String YAML = "yaml";
     public static final String YML = "yml";
@@ -12,7 +12,7 @@ public abstract class SpecApiParameters {
 
     private final String extension;
 
-    protected SpecApiParameters(String providerPrefix, String inputDirectory,
+    protected SpecParameters(String providerPrefix, String inputDirectory,
             String extension) {
         this.providerPrefix = providerPrefix;
         this.inputDirectory = inputDirectory;

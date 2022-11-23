@@ -23,14 +23,14 @@ import io.quarkus.bootstrap.prebuild.CodeGenException;
 import io.quarkus.deployment.CodeGenContext;
 import io.smallrye.config.SmallRyeConfigBuilder;
 
-public abstract class SpecApiGeneratorStreamCodeGen<T extends BaseApiSpecInputProvider<? extends BaseSpecInputModel>>
-        extends SpecApiGeneratorCodeGenBase {
+public abstract class SpecGeneratorStreamCodeGen<T extends BaseSpecInputProvider<? extends BaseSpecInputModel>>
+        extends SpecGeneratorCodeGenBase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpecApiGeneratorStreamCodeGen.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpecGeneratorStreamCodeGen.class);
 
     private final List<T> providers;
 
-    protected SpecApiGeneratorStreamCodeGen(SpecCodeGenerator codeGenerator, SpecApiParameters constants, Class<T> clazz) {
+    protected SpecGeneratorStreamCodeGen(SpecCodeGenerator codeGenerator, SpecParameters constants, Class<T> clazz) {
         super(codeGenerator, constants);
         providers = ServiceLoader.load(clazz).stream().map(ServiceLoader.Provider::get).collect(Collectors.toList());
         LOGGER.debug("Loaded {} providers for class {}", providers, clazz);

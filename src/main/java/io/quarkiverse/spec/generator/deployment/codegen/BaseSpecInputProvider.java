@@ -8,7 +8,7 @@ import io.quarkus.deployment.CodeGenContext;
 /**
  * Provider interface for clients to dynamically provide their own XAPI specification files.
  */
-public interface BaseApiSpecInputProvider<T extends BaseSpecInputModel> {
+public interface BaseSpecInputProvider<T extends BaseSpecInputModel> {
 
     /**
      * Fetch XAPI specification files from a given source.

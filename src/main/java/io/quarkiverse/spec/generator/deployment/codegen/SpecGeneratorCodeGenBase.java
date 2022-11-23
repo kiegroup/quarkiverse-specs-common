@@ -20,12 +20,12 @@ import io.quarkus.deployment.CodeGenProvider;
  * It is responsible for invoking SpecCodeGenerator.generateCode.
  *
  */
-public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
+public abstract class SpecGeneratorCodeGenBase implements CodeGenProvider {
 
     protected final SpecCodeGenerator generator;
-    private final SpecApiParameters constants;
+    private final SpecParameters constants;
 
-    protected SpecApiGeneratorCodeGenBase(SpecCodeGenerator generator, SpecApiParameters constants) {
+    protected SpecGeneratorCodeGenBase(SpecCodeGenerator generator, SpecParameters constants) {
         this.generator = generator;
         this.constants = constants;
     }

@@ -4,14 +4,14 @@ import java.nio.file.Path;
 
 import io.smallrye.config.common.utils.StringUtil;
 
-public final class SpecApiCodeGenUtils {
+public final class SpecCodeGenUtils {
 
-    private SpecApiCodeGenUtils() {
+    private SpecCodeGenUtils() {
     }
 
     public static String getSanitizedFileName(final Path specFilePath) {
         return StringUtil
                 .replaceNonAlphanumericByUnderscores(
-                        SpecApiGeneratorOutputPaths.getRelativePath(specFilePath).toString());
+                        SpecGeneratorOutputPaths.getRelativePath(specFilePath).toString());
     }
 }
