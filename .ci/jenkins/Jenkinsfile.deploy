@@ -281,6 +281,10 @@ void runMavenDeploy(boolean localDeployment = false) {
     mvnCmd.skipTests(true).run('clean deploy')
 }
 
+String getMavenRepoZipUrl() {
+    return "${env.MAVEN_DEPLOY_REPOSITORY.replaceAll('/content/', '/service/local/').replaceFirst('/*$', '')}/content-compressed"
+}
+
 void runMavenStage() {
     MavenStagingHelper stagingHelper = getStagingHelper()
     deployProperties.putAll(stagingHelper.stageLocalArtifacts(env.NEXUS_STAGING_PROFILE_ID, getLocalDeploymentFolder()))
