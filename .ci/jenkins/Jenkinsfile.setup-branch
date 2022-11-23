@@ -150,5 +150,5 @@ void runMavenDeploy(String directory) {
         mvnCmd.withDeployRepository(env.MAVEN_DEPLOY_REPOSITORY)
     }
 
-    mvnCmd.skipTests(true).run('clean deploy')
+    echo mvnCmd.skipTests(true).getFullRunCommand('clean deploy')
 }
