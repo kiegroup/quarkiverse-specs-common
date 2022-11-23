@@ -8,7 +8,7 @@ job_types:
   pullrequest:
     disabled: false
   release:
-    disabled: true
+    disabled: false
   tools:
     disabled: false
 environment: ''
