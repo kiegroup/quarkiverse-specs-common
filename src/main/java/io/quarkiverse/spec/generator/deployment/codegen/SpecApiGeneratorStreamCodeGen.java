@@ -30,7 +30,7 @@ public abstract class SpecApiGeneratorStreamCodeGen<T extends BaseApiSpecInputPr
 
     private final List<T> providers;
 
-    protected SpecApiGeneratorStreamCodeGen(SpecCodeGenerator codeGenerator, SpecApiConstants constants, Class<T> clazz) {
+    protected SpecApiGeneratorStreamCodeGen(SpecCodeGenerator codeGenerator, SpecApiParameters constants, Class<T> clazz) {
         super(codeGenerator, constants);
         providers = ServiceLoader.load(clazz).stream().map(ServiceLoader.Provider::get).collect(Collectors.toList());
         LOGGER.debug("Loaded {} providers for class {}", providers, clazz);
@@ -57,7 +57,7 @@ public abstract class SpecApiGeneratorStreamCodeGen<T extends BaseApiSpecInputPr
                         outChannel.transferFrom(inChannel, 0, Integer.MAX_VALUE);
                         LOGGER.debug("Saved spec input model in {}", specFilePath);
                         Config config = this.mergeConfig(context, inputModel);
-                        generator.generate(config, specFilePath, outDir, getBasePackage(config, specFilePath));
+                        generator.generate(config, specFilePath, outDir);
                         generated = true;
                     }
                 } catch (IOException e) {

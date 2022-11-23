@@ -10,7 +10,7 @@ public class SpecApiGeneratorOutputPaths {
     private SpecApiGeneratorOutputPaths() {
     }
 
-    private static final String STREAM_SUFFIX = "-" + SpecApiConstants.STREAM;
+    private static final String STREAM_SUFFIX = "-" + SpecApiParameters.STREAM;
 
     public static Path getRelativePath(Path path) {
         List<String> paths = new ArrayList<>();

@@ -1,12 +1,10 @@
 package io.quarkiverse.spec.generator.deployment.codegen;
 
-import static io.quarkiverse.spec.generator.deployment.codegen.SpecApiCodeGenUtils.getBasePackagePropertyName;
-import static io.quarkiverse.spec.generator.deployment.codegen.SpecApiCodeGenUtils.getSanitizedFileName;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import org.eclipse.microprofile.config.Config;
@@ -25,9 +23,9 @@ import io.quarkus.deployment.CodeGenProvider;
 public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
 
     protected final SpecCodeGenerator generator;
-    private final SpecApiConstants constants;
+    private final SpecApiParameters constants;
 
-    protected SpecApiGeneratorCodeGenBase(SpecCodeGenerator generator, SpecApiConstants constants) {
+    protected SpecApiGeneratorCodeGenBase(SpecCodeGenerator generator, SpecApiParameters constants) {
         this.generator = generator;
         this.constants = constants;
     }
@@ -36,14 +34,20 @@ public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
     public String inputDirectory() {
         return constants.getInputDirectory();
     }
+    
+    protected  Collection<String> excludedFiles(final Config config) {
+    	return Collections.emptyList();
+    }
+    
+    protected Collection<String> includedFiles(final Config config) {
+    	return Collections.emptyList();
+    }
 
     @Override
     public boolean trigger(CodeGenContext context) throws CodeGenException {
         final Path outDir = context.outDir();
         final Path specDir = context.inputDir();
-        final List<String> ignoredFiles = context.config()
-                .getOptionalValues(SpecApiCodeGenUtils.getIgnoredFilesPropFormat(constants.getConfigPrefix()) ,String.class).orElse(List.of());
-
+        final Collection<String> ignoredFiles = excludedFiles(context.config());
         if (Files.isDirectory(specDir)) {
             try (Stream<Path> specFilePaths = Files.walk(specDir)) {
                 specFilePaths
@@ -52,8 +56,7 @@ public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
                             String fileName = path.getFileName().toString();
                             return fileName.endsWith(inputExtension()) && !ignoredFiles.contains(fileName);
                         })
-                        .forEach(specFilePath -> generator.generate(context.config(), specFilePath, outDir,
-                                getBasePackage(context.config(), specFilePath)));
+                        .forEach(specFilePath -> generator.generate(context.config(), specFilePath, outDir));
             } catch (IOException e) {
                 throw new CodeGenException("Failed to generate java files from directory: " + specDir.toAbsolutePath(),
                         e);
@@ -71,11 +74,5 @@ public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
     @Override
     public String inputExtension() {
         return "." + constants.getExtension();
-    }
-
-    protected final String getBasePackage(final Config config, final Path specFilePath) {
-        return config
-                .getOptionalValue(getBasePackagePropertyName(specFilePath, constants.getConfigPrefix()), String.class)
-                .orElse(String.format("%s.%s", constants.getDefaultPackage(), getSanitizedFileName(specFilePath)));
     }
 }
