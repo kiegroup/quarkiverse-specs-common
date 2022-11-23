@@ -11,7 +11,6 @@ job_types:
     disabled: false
   tools:
     disabled: false
-environment: ''
 productized_branch: false
 disable:
   triggers: false

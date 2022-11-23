@@ -52,12 +52,12 @@ pipeline {
                 script {
                     def buildParams = getDefaultBuildParams()
                     addQuarkiverseSpecsCommonVersionParam(buildParams)
-                    buildJob('optaplanner', buildParams)
+                    buildJob('quarkiverse-specs-common', buildParams)
                 }
             }
             post {
                 failure {
-                    addFailedStage('optaplanner')
+                    addFailedStage('quarkiverse-specs-common')
                 }
             }
         }
