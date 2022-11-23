@@ -15,6 +15,90 @@ import org.kie.jenkins.jobdsl.Utils
 
 jenkins_path = '.ci/jenkins'
 
+///////////////////////////////////////////////////////////////////////////////////////////
+// Global Quarkiverse Specs Common project jobs
+///////////////////////////////////////////////////////////////////////////////////////////
+
+jenkins_path_project = "${jenkins_path}/project"
+
+// Init branch
+createProjectSetupBranchJob()
+
+// Nightly jobs
+setupProjectNightlyJob()
+
+// Release jobs
+setupProjectReleaseJob()
+
+// Tools
+KogitoJobUtils.createMainQuarkusUpdateToolsJob(this,
+        [ 'quarkiverse-specs-common' ],
+        [ 'fjtirado' ]
+)
+
+void createProjectSetupBranchJob() {
+    def jobParams = KogitoJobUtils.getBasicJobParams(this, '0-setup-branch', Folder.SETUP_BRANCH, "${jenkins_path_project}/Jenkinsfile.setup-branch", 'Quarkiverse Specs Common Project Setup Branch')
+    jobParams.env.putAll([
+        JENKINS_EMAIL_CREDS_ID: "${JENKINS_EMAIL_CREDS_ID}",
+
+        GIT_BRANCH_NAME: "${GIT_BRANCH}",
+        GIT_AUTHOR: "${GIT_AUTHOR_NAME}",
+
+        IS_MAIN_BRANCH: "${Utils.isMainBranch(this)}"
+    ])
+    KogitoJobTemplate.createPipelineJob(this, jobParams)?.with {
+        parameters {
+            stringParam('QUARKIVERSE_SPECS_COMMON_VERSION', '', 'Quarkiverse Specs Common version')
+        }
+    }
+}
+
+void setupProjectNightlyJob() {
+    def jobParams = KogitoJobUtils.getBasicJobParams(this, 'quarkiverse-specs-common-nightly', Folder.NIGHTLY, "${jenkins_path_project}/Jenkinsfile.nightly", 'Quarkiverse Specs Common Nightly')
+    jobParams.triggers = [cron : '@midnight']
+    jobParams.env.putAll([
+        JENKINS_EMAIL_CREDS_ID: "${JENKINS_EMAIL_CREDS_ID}",
+
+        GIT_BRANCH_NAME: "${GIT_BRANCH}",
+        GIT_AUTHOR: "${GIT_AUTHOR_NAME}",
+
+        MAVEN_SETTINGS_CONFIG_FILE_ID: "${MAVEN_SETTINGS_FILE_ID}",
+        ARTIFACTS_REPOSITORY: "${MAVEN_ARTIFACTS_REPOSITORY}",
+    ])
+    KogitoJobTemplate.createPipelineJob(this, jobParams)?.with {
+        parameters {
+            booleanParam('SKIP_TESTS', false, 'Skip all tests')
+        }
+    }
+}
+
+void setupProjectReleaseJob() {
+    def jobParams = KogitoJobUtils.getBasicJobParams(this, 'quarkiverse-specs-common-release', Folder.RELEASE, "${jenkins_path_project}/Jenkinsfile.release", 'Quarkiverse Specs Common Release')
+    jobParams.env.putAll([
+        JENKINS_EMAIL_CREDS_ID: "${JENKINS_EMAIL_CREDS_ID}",
+
+        GIT_BRANCH_NAME: "${GIT_BRANCH}",
+        GIT_AUTHOR: "${GIT_AUTHOR_NAME}",
+
+        DEFAULT_STAGING_REPOSITORY: "${MAVEN_NEXUS_STAGING_PROFILE_URL}",
+        ARTIFACTS_REPOSITORY: "${MAVEN_ARTIFACTS_REPOSITORY}",
+    ])
+    KogitoJobTemplate.createPipelineJob(this, jobParams)?.with {
+        parameters {
+            stringParam('RESTORE_FROM_PREVIOUS_JOB', '', 'URL to a previous stopped release job which needs to be continued')
+
+            stringParam('QUARKIVERSE_SPECS_COMMON_VERSION', '', 'Project version of Quarkiverse Specs Common to release as Major.minor.micro')
+            stringParam('QUARKIVERSE_SPECS_COMMON_RELEASE_BRANCH', '', '(optional) Use to override the release branch name deduced from the QUARKIVERSE_SPECS_COMMON_VERSION')
+
+            booleanParam('SKIP_TESTS', false, 'Skip all tests')
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Quarkiverse Common Specs repository only jobs
+///////////////////////////////////////////////////////////////////////////////////////////
+
 Map getMultijobPRConfig(Folder jobFolder) {
     def jobConfig = [
         parallel: true,
