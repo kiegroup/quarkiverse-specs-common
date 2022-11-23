@@ -1,0 +1,1 @@
+This folder contains all Jenkinsfiles related to the whole quarkiverse specs project

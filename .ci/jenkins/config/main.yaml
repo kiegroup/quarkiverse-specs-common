@@ -1,0 +1,23 @@
+ecosystem:
+  main_project: quarkiverse-specs
+  projects:
+  - name: quarkiverse-specs
+    regexs:
+    - quarkiverse-specs.*
+git:
+  branches:
+  - name: setup_ci    
+  main_branch:
+    default: main
+seed:
+  config_file:
+    git:
+      repository: quarkiverse-specs-common
+      author:
+        name: radtriste
+        credentials_id: radtriste
+      branch: setup_ci
+    path: .ci/jenkins/config/branch.yaml
+  jenkinsfile: dsl/seed/jenkinsfiles/Jenkinsfile.seed.branch
+jenkins:
+  email_creds_id: KOGITO_CI_EMAIL_TO_PERSO

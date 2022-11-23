@@ -1,0 +1,55 @@
+job_types:
+  setup-branch:
+    disabled: false
+  nightly:
+    disabled: false
+  other:
+    disabled: true
+  pullrequest:
+    disabled: false
+  release:
+    disabled: false
+  tools:
+    disabled: false
+productized_branch: false
+disable:
+  triggers: false
+repositories:
+- name: quarkiverse-specs-common
+git:
+  author:
+    name: radtriste
+    credentials_id: radtriste
+    token_credentials_id: radtriste-gh-token
+  bot_author: # This is meant to disappear in the near future
+    name: radtriste-bot-account
+    credentials_id: radtriste-bot
+  fork_author: # Used on repository where a fork is needed
+    name: radtriste-bot-account
+    credentials_id: radtriste-bot
+  quarkus: # Used by quarkus platform jobs
+    author:
+      name: radtriste
+      credentials_id: radtriste
+    branch: main
+  jenkins_config_path: .ci/jenkins
+buildchain_config:
+  git:
+    repository: quarkiverse-specs-common
+maven:
+  settings_file_id: 2bd418aa-56fa-4403-9232-8c77a50fc528
+  nexus:
+    release_url: https://repository.stage.jboss.org/nexus
+    release_repository: jboss-releases-repository
+    staging_profile_url: https://repository.stage.jboss.org/nexus/content/groups/kogito-public/
+    staging_profile_id: 2161b7b8da0080
+    build_promotion_profile_id: 1966c60aff37d
+  artifacts_repository: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/
+  artifacts_upload_repository:
+    url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/
+    creds_id: anything
+jenkins:
+  email_creds_id: KOGITO_CI_EMAIL_TO_PERSO
+  default_tools:
+    jdk: kie-jdk11
+    maven: kie-maven-3.8.6

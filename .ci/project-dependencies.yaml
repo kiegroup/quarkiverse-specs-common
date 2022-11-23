@@ -1,0 +1,3 @@
+version: "2.1"
+dependencies:
+  - project: kiegroup/quarkiverse-specs-common
