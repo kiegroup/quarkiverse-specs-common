@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SpecApiGeneratorOutputPaths {
+public class SpecGeneratorOutputPaths {
 
-    private SpecApiGeneratorOutputPaths() {
+    private SpecGeneratorOutputPaths() {
     }
 
-    private static final String STREAM_SUFFIX = "-" + SpecApiConstants.STREAM;
+    private static final String STREAM_SUFFIX = "-" + SpecParameters.STREAM;
 
     public static Path getRelativePath(Path path) {
         List<String> paths = new ArrayList<>();

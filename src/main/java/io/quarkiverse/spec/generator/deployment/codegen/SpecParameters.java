@@ -1,6 +1,6 @@
 package io.quarkiverse.spec.generator.deployment.codegen;
 
-public abstract class SpecApiConstants {
+public abstract class SpecParameters {
 
     public static final String YAML = "yaml";
     public static final String YML = "yml";
@@ -9,16 +9,13 @@ public abstract class SpecApiConstants {
 
     private final String providerPrefix;
     private final String inputDirectory;
-    private final String defaultPackage;
-    private final String configPrefix;
+
     private final String extension;
 
-    protected SpecApiConstants(String providerPrefix, String inputDirectory, String defaultPackage, String configPrefix,
+    protected SpecParameters(String providerPrefix, String inputDirectory,
             String extension) {
         this.providerPrefix = providerPrefix;
         this.inputDirectory = inputDirectory;
-        this.defaultPackage = defaultPackage;
-        this.configPrefix = configPrefix;
         this.extension = extension;
     }
 
@@ -30,22 +27,14 @@ public abstract class SpecApiConstants {
         return inputDirectory;
     }
 
-    public String getDefaultPackage() {
-        return defaultPackage;
-    }
-
-    public String getConfigPrefix() {
-        return configPrefix;
-    }
-
     public String getExtension() {
         return extension;
     }
 
     @Override
     public String toString() {
-        return "XApiConstants [providerPrefix=" + providerPrefix + ", inputDirectory=" + inputDirectory
-                + ", defaultPackage=" + defaultPackage + ", configPrefix=" + configPrefix + ", extension=" + extension
-                + "]";
+        return "SpecApiParameters [providerPrefix=" + providerPrefix + ", inputDirectory=" + inputDirectory
+                + ", extension=" + extension + "]";
     }
+
 }

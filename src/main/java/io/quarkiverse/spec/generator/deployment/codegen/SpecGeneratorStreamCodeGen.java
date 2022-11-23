@@ -23,17 +23,17 @@ import io.quarkus.bootstrap.prebuild.CodeGenException;
 import io.quarkus.deployment.CodeGenContext;
 import io.smallrye.config.SmallRyeConfigBuilder;
 
-public abstract class SpecApiGeneratorStreamCodeGen<T extends BaseApiSpecInputProvider<? extends BaseSpecInputModel>>
-        extends SpecApiGeneratorCodeGenBase {
+public abstract class SpecGeneratorStreamCodeGen<T extends BaseSpecInputProvider<? extends BaseSpecInputModel>>
+        extends SpecGeneratorCodeGenBase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpecApiGeneratorStreamCodeGen.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpecGeneratorStreamCodeGen.class);
 
     private final List<T> providers;
 
-    protected SpecApiGeneratorStreamCodeGen(SpecCodeGenerator codeGenerator, SpecApiConstants constants, Class<T> clazz) {
+    protected SpecGeneratorStreamCodeGen(SpecCodeGenerator codeGenerator, SpecParameters constants, Class<T> clazz) {
         super(codeGenerator, constants);
         providers = ServiceLoader.load(clazz).stream().map(ServiceLoader.Provider::get).collect(Collectors.toList());
-        LOGGER.debug("Loaded {} OpenApiSpecInputProviders", providers);
+        LOGGER.debug("Loaded {} providers for class {}", providers, clazz);
     }
 
     @Override
@@ -44,20 +44,20 @@ public abstract class SpecApiGeneratorStreamCodeGen<T extends BaseApiSpecInputPr
 
         for (final T provider : this.providers) {
             for (BaseSpecInputModel inputModel : provider.read(context)) {
-                LOGGER.debug("Processing OpenAPI spec input model {}", inputModel);
+                LOGGER.debug("Processing spec input model {}", inputModel);
                 if (inputModel == null) {
-                    throw new CodeGenException("SpecInputModel from provider " + provider + " is null");
+                    throw new CodeGenException("Data returned by provider " + provider + " is null");
                 }
                 try {
-                    final Path openApiFilePath = Paths.get(outDir.toString(), inputModel.getFileName());
-                    Files.createDirectories(openApiFilePath.getParent());
+                    final Path specFilePath = Paths.get(outDir.toString(), inputModel.getFileName());
+                    Files.createDirectories(specFilePath.getParent());
                     try (ReadableByteChannel inChannel = Channels.newChannel(inputModel.getInputStream());
-                            FileChannel outChannel = FileChannel.open(openApiFilePath, StandardOpenOption.WRITE,
+                            FileChannel outChannel = FileChannel.open(specFilePath, StandardOpenOption.WRITE,
                                     StandardOpenOption.CREATE)) {
                         outChannel.transferFrom(inChannel, 0, Integer.MAX_VALUE);
-                        LOGGER.debug("Saved OpenAPI spec input model in {}", openApiFilePath);
+                        LOGGER.debug("Saved spec input model in {}", specFilePath);
                         Config config = this.mergeConfig(context, inputModel);
-                        generator.generate(config, openApiFilePath, outDir, getBasePackage(config, openApiFilePath));
+                        generator.generate(config, specFilePath, outDir);
                         generated = true;
                     }
                 } catch (IOException e) {
