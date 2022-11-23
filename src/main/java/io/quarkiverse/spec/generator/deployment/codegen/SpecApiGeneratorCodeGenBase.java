@@ -17,7 +17,7 @@ import io.quarkus.deployment.CodeGenProvider;
  * Base class for Spec generator.
  * 
  * It contain the code for scanning input files based on SpecApiContants provided by concrete extensions
- * It is responsible for invoking SpecCodeGenerator.generateCode. 
+ * It is responsible for invoking SpecCodeGenerator.generateCode.
  *
  */
 public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
@@ -34,13 +34,13 @@ public abstract class SpecApiGeneratorCodeGenBase implements CodeGenProvider {
     public String inputDirectory() {
         return constants.getInputDirectory();
     }
-    
-    protected  Collection<String> excludedFiles(final Config config) {
-    	return Collections.emptyList();
+
+    protected Collection<String> excludedFiles(final Config config) {
+        return Collections.emptyList();
     }
-    
+
     protected Collection<String> includedFiles(final Config config) {
-    	return Collections.emptyList();
+        return Collections.emptyList();
     }
 
     @Override

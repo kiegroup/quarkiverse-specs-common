@@ -1,7 +1,5 @@
 package io.quarkiverse.spec.generator.deployment.codegen;
 
-import java.util.Collection;
-
 public abstract class SpecApiParameters {
 
     public static final String YAML = "yaml";
@@ -11,7 +9,7 @@ public abstract class SpecApiParameters {
 
     private final String providerPrefix;
     private final String inputDirectory;
-    
+
     private final String extension;
 
     protected SpecApiParameters(String providerPrefix, String inputDirectory,
@@ -32,12 +30,11 @@ public abstract class SpecApiParameters {
     public String getExtension() {
         return extension;
     }
-    
-	
-	@Override
-	public String toString() {
-		return "SpecApiParameters [providerPrefix=" + providerPrefix + ", inputDirectory=" + inputDirectory
-				+ ", extension=" + extension + "]";
-	}
+
+    @Override
+    public String toString() {
+        return "SpecApiParameters [providerPrefix=" + providerPrefix + ", inputDirectory=" + inputDirectory
+                + ", extension=" + extension + "]";
+    }
 
 }

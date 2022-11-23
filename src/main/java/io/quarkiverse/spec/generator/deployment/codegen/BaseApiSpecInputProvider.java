@@ -16,5 +16,4 @@ public interface BaseApiSpecInputProvider<T extends BaseSpecInputModel> {
      * @return a list of spec files in {@link InputStream} format.
      */
     List<T> read(CodeGenContext context);
-
 }

@@ -1,7 +1,5 @@
 package io.quarkiverse.spec.generator.deployment.codegen;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +8,8 @@ import java.util.Objects;
 import org.eclipse.microprofile.config.spi.ConfigSource;
 
 import io.smallrye.config.PropertiesConfigSource;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class BaseSpecInputModel {
 
