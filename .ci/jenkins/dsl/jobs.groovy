@@ -33,7 +33,7 @@ setupProjectReleaseJob()
 // Tools
 KogitoJobUtils.createMainQuarkusUpdateToolsJob(this,
         [ 'quarkiverse-specs-common' ],
-        [ 'fjtirado' ]
+        [ 'radtriste' ]
 )
 
 void createProjectSetupBranchJob() {

@@ -8,7 +8,7 @@ git:
   branches:
   - name: setup_ci    
   main_branch:
-    default: setup_ci
+    default: main
 seed:
   config_file:
     git:
